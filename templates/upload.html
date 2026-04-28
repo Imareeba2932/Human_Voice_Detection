@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero animate-fade-in" style="text-align: center; margin-bottom: 4rem;">
+    <h1 style="font-size: 3.5rem; line-height: 1.2; margin-bottom: 1rem;">
+        Analyze Audio with <br>
+        <span
+            style="background: linear-gradient(135deg, #6366f1, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Surgical
+            Precision</span>
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.25rem; max-width: 700px; margin: 0 auto 2.5rem;">
+        Detect human voices, identify distinct speakers, and separate individual audio tracks using state-of-the-art AI.
+    </p>
+</div>
+
+<div class="card animate-fade-in" style="animation-delay: 0.2s;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 1.75rem;">Upload Your Content</h2>
+        <p style="color: var(--text-muted);">Support for MP3, WAV, MP4, and more.</p>
+    </div>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="upload-form">
+        <label for="file-upload" class="upload-area" id="drop-zone">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+            <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Drag & drop your file here or <span
+                    style="color: var(--primary);">browse</span></p>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">Maximum file size: 50MB</p>
+            <input type="file" id="file-upload" name="file" hidden accept="audio/*,video/*">
+        </label>
+
+        <div id="file-info"
+            style="margin-top: 1.5rem; display: none; text-align: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 12px; border: 1px dashed var(--glass-border);">
+            <p style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <i class="far fa-file-audio"></i>
+                <span id="filename-display"></span>
+            </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" id="submit-btn" disabled
+                style="padding: 1rem 3rem; font-size: 1.1rem;">
+                <i class="fas fa-microchip"></i> Start Analysis
+            </button>
+        </div>
+    </form>
+
+    <div id="loading" style="display: none; text-align: center; margin-top: 2rem;">
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; color: var(--primary);">Our AI is processing your audio, this may take a moment...
+        </p>
+    </div>
+</div>
+
+<div id="features" class="grid-features animate-fade-in"
+    style="animation-delay: 0.4s; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem;">
+    <div class="card" style="margin-bottom: 0; padding: 2rem;">
+        <i class="fas fa-user-check" style="font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+        <h3 style="font-size: 1.25rem;">Human Detection</h3>
+        <p style="color: var(--text-muted);">Filter out noise and extract only segments containing human speech.</p>
+    </div>
+    <div class="card" style="margin-bottom: 0; padding: 2rem;">
+        <i class="fas fa-users-viewfinder" style="font-size: 2rem; color: var(--secondary); margin-bottom: 1.5rem;"></i>
+        <h3 style="font-size: 1.25rem;">Speaker Diarization</h3>
+        <p style="color: var(--text-muted);">Identify "who spoke when" across the entire duration of the audio.</p>
+    </div>
+    <div class="card" style="margin-bottom: 0; padding: 2rem;">
+        <i class="fas fa-scissors" style="font-size: 2rem; color: #10b981; margin-bottom: 1.5rem;"></i>
+        <h3 style="font-size: 1.25rem;">Track Separation</h3>
+        <p style="color: var(--text-muted);">Automatically split audio into separate files for each individual speaker.
+        </p>
+    </div>
+</div>
+
+<style>
+    .upload-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed var(--glass-border);
+        border-radius: 20px;
+        padding: 4rem 2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.05);
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-left-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-upload');
+    const fileInfo = document.getElementById('file-info');
+    const filenameDisplay = document.getElementById('filename-display');
+    const submitBtn = document.getElementById('submit-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const loading = document.getElementById('loading');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            fileInput.files = files;
+            filenameDisplay.textContent = file.name;
+            fileInfo.style.display = 'block';
+            submitBtn.disabled = false;
+        }
+    }
+
+    uploadForm.addEventListener('submit', () => {
+        loading.style.display = 'block';
+        submitBtn.style.display = 'none';
+        dropZone.style.display = 'none';
+        fileInfo.style.display = 'none';
+    });
+</script>
+{% endblock %}

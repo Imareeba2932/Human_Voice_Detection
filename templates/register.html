@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="card animate-fade-in" style="width: 100%; max-width: 450px; padding: 3rem;">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <div style="width: 60px; height: 60px; background: rgba(236, 72, 153, 0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                <i class="fas fa-user-plus" style="font-size: 1.5rem; color: var(--secondary);"></i>
+            </div>
+            <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Join VoiceSense</h2>
+            <p style="color: var(--text-muted);">Start your journey into AI audio analysis.</p>
+        </div>
+
+        <form method="POST">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Username</label>
+                <div style="position: relative;">
+                    <i class="fas fa-user" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="username" required 
+                           style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: white; outline: none; transition: border-color 0.3s;"
+                           onfocus="this.style.borderColor='var(--secondary)'" onblur="this.style.borderColor='var(--glass-border)'">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Email Address</label>
+                <div style="position: relative;">
+                    <i class="fas fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="email" name="email" required
+                           style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: white; outline: none; transition: border-color 0.3s;"
+                           onfocus="this.style.borderColor='var(--secondary)'" onblur="this.style.borderColor='var(--glass-border)'">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Password</label>
+                <div style="position: relative;">
+                    <i class="fas fa-key" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="password" name="password" required
+                           style="width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; color: white; outline: none; transition: border-color 0.3s;"
+                           onfocus="this.style.borderColor='var(--secondary)'" onblur="this.style.borderColor='var(--glass-border)'">
+                </div>
+            </div>
+
+            <button type="submit" class="btn" style="background: linear-gradient(135deg, var(--secondary), #be185d); color: white; width: 100%; justify-content: center; padding: 1rem; font-size: 1rem;">
+                Create Account <i class="fas fa-rocket" style="margin-left: 0.5rem;"></i>
+            </button>
+        </form>
+
+        <p style="text-align: center; margin-top: 2rem; color: var(--text-muted); font-size: 0.9rem;">
+            Already have an account? <a href="/login" style="color: var(--secondary); text-decoration: none; font-weight: 600;">Sign in here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

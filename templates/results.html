@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="animate-fade-in">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem;">
+        <div>
+            <h1 style="margin-bottom: 0.5rem;">Analysis Results</h1>
+            <p style="color: var(--text-muted);"><i class="far fa-file"></i> {{ results.filename }}</p>
+        </div>
+        <a href="/" class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);">
+            <i class="fas fa-redo"></i> Analyze Another
+        </a>
+    </div>
+
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="card" style="margin-bottom: 0; padding: 1.5rem; text-align: center;">
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Speakers Detected</p>
+            <h2 style="font-size: 2.5rem; margin-bottom: 0;">{{ results.total_speakers }}</h2>
+        </div>
+        <div class="card" style="margin-bottom: 0; padding: 1.5rem; text-align: center;">
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Voice Segments</p>
+            <h2 style="font-size: 2.5rem; margin-bottom: 0;">{{ results.total_segments }}</h2>
+        </div>
+        <div class="card" style="margin-bottom: 0; padding: 1.5rem; text-align: center;">
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem;">Quality Score</p>
+            <h2 style="font-size: 2.5rem; margin-bottom: 0;">98%</h2>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <!-- Timeline Section -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-stream" style="color: var(--primary);"></i>
+                Conversation Timeline
+            </h3>
+
+            <div class="timeline-container" style="max-height: 500px; overflow-y: auto; padding-right: 1rem;">
+                {% for entry in results.timeline %}
+                <div class="timeline-item"
+                    style="display: flex; gap: 1rem; border-left: 2px solid var(--primary); padding-left: 1.5rem; margin-bottom: 1.5rem; position: relative;">
+                    <div class="speaker-dot"
+                        style="width: 12px; height: 12px; border-radius: 50%; background: var(--secondary); position: absolute; left: -7px; top: 5px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <span style="font-weight: 600; color: var(--primary);">{{ entry.speaker }}</span>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">{{ entry.start_formatted }} - {{
+                                entry.end_formatted }}</span>
+                        </div>
+                        <div
+                            style="background: rgba(255,255,255,0.03); padding: 0.75rem; border-radius: 8px; font-size: 0.95rem;">
+                            Speaking for {{ "%.2f"|format(entry.duration) }} seconds.
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Speaker Breakdown -->
+        <div>
+            <div class="card">
+                <h3 style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-users" style="color: var(--secondary);"></i>
+                    Speaker Profiles
+                </h3>
+
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    {% for speaker, stats in results.speaker_stats.items() %}
+                    <div
+                        style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 1.25rem; border-radius: 16px;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-weight: 600; font-size: 1.1rem;">{{ speaker }}</span>
+                            <span
+                                style="background: var(--primary); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem;">Active</span>
+                        </div>
+
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                            <div>
+                                <i class="far fa-clock"></i> Duration: {{ "%.2f"|format(stats.total_duration) }}s
+                            </div>
+                            <div>
+                                <i class="fas fa-layer-group"></i> Turns: {{ stats.num_segments }}
+                            </div>
+                        </div>
+
+                        <!-- Audio Player -->
+                        {% set speaker_file = results.output_files.get(speaker) %}
+                        {% if speaker_file %}
+                        <div style="margin-top: 0.5rem;">
+                            <audio controls style="width: 100%; height: 35px; border-radius: 8px;">
+                                <source src="{{ url_for('static', filename=speaker_file) }}" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card"
+                style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));">
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Need Export?</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Download the full
+                    analysis report and separated tracks for archival.</p>
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-download"></i> Export Bundle
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .timeline-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .timeline-container::-webkit-scrollbar-thumb {
+        background: var(--glass-border);
+        border-radius: 10px;
+    }
+
+    .timeline-container::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+
+    audio::-webkit-media-controls-panel {
+        background-color: var(--card-bg);
+    }
+
+    audio::-webkit-media-controls-current-time-display,
+    audio::-webkit-media-controls-time-remaining-display {
+        color: var(--text);
+    }
+</style>
+{% endblock %}
